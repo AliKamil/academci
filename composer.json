@@ -1,0 +1,10 @@
+{
+  "autoload": {
+    "psr-0": {
+      "App": "lib/"
+    }
+  },
+  "require": {
+    "symfony/console": "^3.0"
+  }
+}
