@@ -67,5 +67,18 @@ class Year extends Entity
         }
 
     }
+
+    public function belongs(\DateTime $date){
+        return ($date >= $this->getStartDate() && (is_null($this->getStopDate()) || $date <= $this->getStopDate()));
+    }
+
+    public function getTerm(\DateTime $date)
+    {
+        foreach ($this->terms as $term) {
+            if ($date >= $term->getStartDate() && $date <= $term->getStopDate()) {
+                return $term;
+            }
+        }
+    }
 }
 

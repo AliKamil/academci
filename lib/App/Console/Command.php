@@ -15,7 +15,7 @@ class Command extends BaseCommand
         $this->setName('app:academy')
              ->setDescription('Returns academic year by given date')
              ->addOption('filename', 'f', InputOption::VALUE_OPTIONAL, 'Path to datafile', 'example.json')
-        ->addArgument('data', InputArgument::REQUIRED);
+             ->addArgument('data', InputArgument::REQUIRED);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -30,6 +30,22 @@ class Command extends BaseCommand
         $data = json_decode($data, true);
         $factory = new EntityFactory($data['format']);
         $years = $factory->createFromData($data['data']);
-        die;
+
+        $givenDate = $input->getArgument('data');
+        $givenDate = \DateTime::createFromFormat($data['format'], $givenDate);
+        if(!$givenDate){
+            $output->writeln('Incorrect argument');
+            die;
+        }
+
+        foreach($years as $year){
+            if($year->belongs($givenDate)){
+                $output->writeln($year->getName());
+                $term = $year->getTerm($givenDate);
+                if($term){
+                    $output->writeln(sprintf('%s(\'%s\' - \'%s\')',$term->getName(), $term->getStartDate()->format('Y-m-d'), $term->getStopDate()->format('Y-m-d')));
+                }
+            }
+        }
     }
 }
