@@ -10,5 +10,8 @@ namespace App\Entity;
  */
 class Term extends Entity
 {
-   
+    public function getLength()
+    {
+       return $this->getStartDate()->diff($this->getStopDate());
+    }
 }

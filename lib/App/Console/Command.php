@@ -29,21 +29,31 @@ class Command extends BaseCommand
         $data = fread($stream, filesize($filename));
         $data = json_decode($data, true);
         $factory = new EntityFactory($data['format']);
-        $years = $factory->createFromData($data['data']);
-
+        try {
+            $years = $factory->createFromData($data['data']);
+        } catch (\Exception $e) {
+            $output->writeln($e->getMessage());
+            die;
+        }
         $givenDate = $input->getArgument('data');
         $givenDate = \DateTime::createFromFormat($data['format'], $givenDate);
-        if(!$givenDate){
+        if (!$givenDate) {
             $output->writeln('Incorrect argument');
             die;
         }
 
-        foreach($years as $year){
-            if($year->belongs($givenDate)){
+        foreach ($years as $year) {
+            if ($year->belongs($givenDate)) {
                 $output->writeln($year->getName());
                 $term = $year->getTerm($givenDate);
-                if($term){
-                    $output->writeln(sprintf('%s(\'%s\' - \'%s\')',$term->getName(), $term->getStartDate()->format('Y-m-d'), $term->getStopDate()->format('Y-m-d')));
+                if ($term) {
+                    $output->writeln(sprintf('%s(\'%s\' - \'%s\') - %s days',
+                        $term->getName(),
+                        $term->getStartDate()
+                             ->format('Y-m-d'),
+                        $term->getStopDate()
+                             ->format('Y-m-d'),
+                        $term->getLength()->format('%a')));
                 }
             }
         }
